@@ -1,0 +1,76 @@
+
+app-chatbox {
+    --width: 300px;
+    --height: 500px;
+
+}
+
+
+
+app-chatbox {
+    --input-height: 32px;
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    width: var(--width);
+    height: var(--height);
+    background-color: rgb(38, 38, 38);
+}
+
+app-chatbox .messages-container {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(var(--height) - var(--input-height));
+    padding: 10px;
+}
+
+app-chatbox .input-container {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    width: var(--width);
+    height: var(--input-height);
+}
+app-chatbox .input-container .textarea {
+    position: absolute;
+    box-sizing: border-box;
+    resize: none;
+    border-radius: 7px;
+    padding: 5px;
+    margin: 0;
+    height: auto;
+    min-height: 28px;
+    width: calc(var(--width) - 32px);
+    left: 32px;
+    bottom: 7px;
+    border: none;
+    overflow: hidden;
+    background-color: rgb(86, 86, 86);
+    color: #fff;
+}
+app-chatbox .input-container.attach-files .textarea {
+    width: calc(var(--width) - 64px)
+}
+
+app-chatbox .input-container svg {
+    position: absolute;
+    fill: #fff;
+    box-sizing: border-box;
+    padding: 5px;
+    width: 32px;
+    height: 32px;
+    left: 1px;
+    bottom: 6px;
+    border-radius: 50%;
+    transition: all .4s;
+}
+
+app-chatbox .input-container svg:hover {
+    background-color: rgba(255, 255, 255, .1)
+}
+
+app-chatbox .input-container svg[data-icon-name='send'] {
+    left: unset;
+    right: 1px;
+}
