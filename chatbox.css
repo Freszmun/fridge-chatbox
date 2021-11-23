@@ -8,7 +8,7 @@ app-chatbox {
 
 
 app-chatbox {
-    --input-height: 32px;
+    --input-height: 38px;
     position: relative;
     display: inline-block;
     box-sizing: border-box;
@@ -17,12 +17,129 @@ app-chatbox {
     background-color: rgb(38, 38, 38);
 }
 
+app-chatbox * {
+    font-family: Roboto, "Helvetica Neue", Helvetica, Arial, "Open Sans", sans-serif;
+    font-size: 1em;
+}
+
+
+app-chatbox *::-webkit-scrollbar {
+    width: .8em;
+}
+
+app-chatbox *::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(255, 255, 255, .04);
+}
+
+app-chatbox *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .08);
+    border-radius: 0;
+}
+
+app-chatbox *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, .16);
+}
+
 app-chatbox .messages-container {
     display: inline-block;
     box-sizing: border-box;
     width: 100%;
+    overflow: hidden auto;
     height: calc(var(--height) - var(--input-height));
+    max-height: calc(var(--height) - var(--input-height));
     padding: 10px;
+    font-size: .8em;
+}
+app-chatbox .messages-container .message {
+    width: 100%;
+    overflow: hidden auto;
+    margin-bottom: 10px;
+}
+
+app-chatbox .messages-container .message.tab-group {
+    margin-bottom: 1px;
+}
+
+app-chatbox .messages-container .message.tab-group .text-box {
+    position: relative;
+    top: 5px;
+}
+
+app-chatbox .messages-container .message.tab .text-box {
+    top: 0;
+}
+
+app-chatbox .messages-container .message .name {
+    float: left;
+    width: calc(100% - 80px);
+    text-align: left;
+    padding-left: 12px;
+    font-size: .9em;
+    color: rgb(157, 157, 157);
+}
+
+app-chatbox .messages-container .message .time {
+    text-align: center;
+    width: 100%;
+    font-size: .8em;
+    color: rgb(157, 157, 157);
+    display: none;
+}
+
+app-chatbox .messages-container .message.show-date .time {
+    display: block;
+}
+
+app-chatbox .messages-container .message .text-box {
+    border-radius: 1px 5px 5px 5px;
+    background-color: rgb(82, 82, 82);
+    color: #fff;
+    max-width: 80%;
+    box-sizing: border-box;
+    padding: 4px;
+    margin: 2px 0 5px 10px;
+    float: left;
+    text-align: left;
+    font-size: 1.2em;
+    word-wrap: anywhere;
+    white-space: normal;
+    word-break: break-all;
+}
+
+app-chatbox .messages-container .message.tab .text-box {
+    margin: 2px 0 0 54px;
+}
+
+app-chatbox .messages-container .message img {
+    float: left;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+}
+
+app-chatbox .messages-container .message.right .name {
+    text-align: right;
+    padding-left: unset;
+    padding-right: 12px;
+    float: right;
+}
+
+
+app-chatbox .messages-container .message.right .text-box {
+    border-radius: 5px 1px 5px 5px;
+    margin: 2px 10px 5px 0;
+    float: right;
+}
+
+app-chatbox .messages-container .message.right.tab .text-box {
+    margin: 2px 54px 0 0;
+}
+
+app-chatbox .messages-container .message.right img {
+    float: right;
 }
 
 app-chatbox .input-container {
@@ -32,25 +149,32 @@ app-chatbox .input-container {
     width: var(--width);
     height: var(--input-height);
 }
+/* TODO: we can do it better */
 app-chatbox .input-container .textarea {
     position: absolute;
     box-sizing: border-box;
     resize: none;
-    border-radius: 7px;
-    padding: 5px;
+    border-radius: 10px;
+    padding: 8px;
     margin: 0;
     height: auto;
-    min-height: 28px;
-    width: calc(var(--width) - 32px);
-    left: 32px;
+    min-height: 36px;
+    max-height: 120px;
+    width: calc(var(--width) - 44px);
+    left: 4px;
     bottom: 7px;
     border: none;
-    overflow: hidden;
+    word-wrap: anywhere;
+    white-space: normal;
+    word-break: break-all;
+    overflow: hidden auto;
     background-color: rgb(86, 86, 86);
     color: #fff;
 }
+
 app-chatbox .input-container.attach-files .textarea {
-    width: calc(var(--width) - 64px)
+    left: 40px;
+    width: calc(var(--width) - 80px)
 }
 
 app-chatbox .input-container svg {
@@ -58,8 +182,8 @@ app-chatbox .input-container svg {
     fill: #fff;
     box-sizing: border-box;
     padding: 5px;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     left: 1px;
     bottom: 6px;
     border-radius: 50%;

@@ -30,10 +30,12 @@
         config = {
             // show user avatars
             showAvatars: true,
+            // show user names
+            showNames: true,
+            // show message time
+            showTime: true,
             // setting messages float
             messages2Side: true,
-            // show message without waiting for server response
-            showMessageInChatboxOnEnter: true,
             // allowed methods
             methods: {
                 // allow user input
@@ -43,7 +45,7 @@
                 // add more button on message
                 moreActionsMessage: true,
                 // allow adding files
-                attachFiles: true,
+                attachFiles: false,
                 // filter files by type
                 attachFilesFilter: function (mimetype) {
                     // allow only images
@@ -54,7 +56,7 @@
                 messages: {context: null, click: null},
                 attachments: {context: null, click: null},
                 avatar: {context: null, click: null},
-                onEnter: null
+                onSend: null
             }
         };
         messagesContainer;
@@ -66,7 +68,7 @@
             _this.appendChild(_this.messagesContainer);
             if (_this.config.methods.input) {
                 _this.messageInputContainer.classList.add('input-container');
-                _this.messageInputContainer.classList.add('attach-files')
+                if (_this.config.methods.attachFiles) _this.messageInputContainer.classList.add('attach-files');
                 _this.messageInputContainer.innerHTML = `${(_this.config.methods.attachFiles ? `<div class="attachments-view"></div>
 ${icon('attachment')}` : '')}
 <p class="textarea" contenteditable="true"></p>
@@ -77,14 +79,26 @@ ${icon('send')}`;
         clearChatbox() {
             this.messagesContainer.innerHTML = '';
         }
-        append(elem) {
+        appendBefore(elem) {
             let firstMessage = this.messagesContainer.firstChild;
             if (firstMessage) this.messagesContainer.insertBefore(elem, firstMessage);
                 else this.messagesContainer.appendChild(elem);
         }
-        appendMessage(obj, self) {
+        append(elem) {
+            // TODO: add something like this for appendBefore
+            let lastMessage = this.messagesContainer.lastChild;
+            this.messagesContainer.appendChild(elem);
+            if (lastMessage && lastMessage.getAttribute('data-message-author') === elem.getAttribute('data-message-author')) {
+                elem.removeChild(elem.querySelector('img'));
+                elem.removeChild(elem.querySelector('.name'));
+                elem.classList.add('tab');
+                elem.previousElementSibling.classList.add('tab-group');
+            }
+        }
+        createMessage(obj, self) {
             /*{
                 id: 0,
+                time: 'yyyy-mm-dd hh:mm',
                 author: {
                     id: 0,
                     name: 'str',
@@ -105,22 +119,81 @@ ${icon('send')}`;
             messageElem.classList.add('message');
             if (this.config.messages2Side) messageElem.classList.add((self ? 'right' : 'left'));
             if (this.config.showAvatars) messageElem.classList.add('show-avatars');
+            messageElem.setAttribute('data-message-id', obj.id);
+            messageElem.setAttribute('data-message-author', obj.author.id);
             messageElem.innerHTML = `
-<span class="name">${obj.author.name}</span>
+${(this.config.showTime ? `<span class="time">${obj.time}</span>` : '')}
 ${(this.config.showAvatars ? `<img src="${obj.author.avatar}" alt="${obj.author.name}">` : '')}
-${(obj.content.text ? `<div class="text-box">${obj.content.text}</div>` : '')}
+${(this.config.showNames ? `<span class="name">${obj.author.name}</span>` : '')}
+${(obj.content.text ? `<div class="text-box"></div>` : '')}
 ${((obj.content.attachments && obj.content.attachments.length > 0) ? `<div class="attachments">
 ${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" --data-src="[src]" --data-message="${obj.id}" --data-author="${obj.author.id}" alt="[name]">`))}
 </div>` : '')}`;
-            this.append(messageElem);
+            if (obj.content.text) setTimeout(() => {
+                messageElem.querySelector('.text-box').innerText = obj.content.text;
+            })
+            return messageElem;
+        }
+        appendMessage(obj, self) {
+            let scrollBottom = (this.messagesContainer.scrollHeight - 40 <= this.messagesContainer.scrollTop + this.messagesContainer.clientHeight) ? (this.messagesContainer.scrollHeight + 9999) : false;
+            this.append(this.createMessage(obj, self));
+            if (scrollBottom) setTimeout(() => {
+                this.messagesContainer.scrollTo(0, scrollBottom);
+            });
+        }
+        appendBeforeMessage(obj, self) {
+            this.appendBefore(this.createMessage(obj, self));
+        }
+
+        checkInputHeight(ev) {
+            if (ev.target.tagName === 'P')
+                this.style.setProperty('--input-height', (ev.target.clientHeight + 2) + 'px');
+        }
+
+        sendAction(elem) {
+            let text = elem.innerText.replaceAll(RegExp(/\<br\>/gm), '\n');
+            if (!text || text === '') return;
+            if (this.config.actions.onSend) this.config.actions.onSend(text);
+            elem.innerHTML = '';
+            this.style.setProperty('--input-height', (elem.clientHeight + 2) + 'px');
         }
 
         connectedCallback() {
+            this.addEventListener("paste", function(ev) {
+                ev.preventDefault();
+                let text = (ev.originalEvent || ev).clipboardData.getData('text/plain');
+                document.execCommand("insertText", false, text);
+                this.checkInputHeight(ev);
+            });
+            this.addEventListener('cut', this.checkInputHeight);
+            this.addEventListener('change', this.checkInputHeight);
+            this.addEventListener('keydown', ev => {
+                if (ev.target.tagName === 'P'&& ev.key === 'Enter' && !ev.shiftKey) ev.preventDefault();
+            });
             this.addEventListener('keyup', ev => {
                 if (ev.target.tagName === 'P') {
-                    this.style.setProperty('--input-height', (ev.target.clientHeight + 2) + 'px');
+                    this.style.setProperty('--input-height', (ev.target.clientHeight + 6) + 'px');
+                    if (ev.key === 'Enter') {
+                        if (!ev.shiftKey) {
+                            this.sendAction(ev.target);
+                        }
+                    }
                 }
-            })
+            });
+            this.addEventListener('click', ev => {
+                if (!ev.target) return;
+                if (ev.target.getAttribute('data-icon-name') === 'send') {
+                    this.sendAction(this.messageInputContainer.querySelector("p.textarea"));
+                }
+                let closestMessage = ev.target.closest('.message');
+                if (closestMessage) {
+                    if (closestMessage.classList.contains('show-date')) {
+                        closestMessage.classList.remove('show-date');
+                    } else {
+                        closestMessage.classList.add('show-date');
+                    }
+                }
+            });
             setTimeout(this.initialize, null, this);
         }
     }
