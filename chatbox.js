@@ -62,8 +62,8 @@
         messagesContainer;
         messageInputContainer;
         initialize(_this) {
-            _this.messagesContainer = document.createElement('div'),
-                _this.messageInputContainer = document.createElement('div');
+            _this.messagesContainer = document.createElement('div');
+            _this.messageInputContainer = document.createElement('div');
             _this.messagesContainer.classList.add('messages-container');
             _this.appendChild(_this.messagesContainer);
             if (_this.config.methods.input) {
@@ -127,7 +127,7 @@ ${(this.config.showAvatars ? `<img src="${obj.author.avatar}" alt="${obj.author.
 ${(this.config.showNames ? `<span class="name">${obj.author.name}</span>` : '')}
 ${(obj.content.text ? `<div class="text-box"></div>` : '')}
 ${((obj.content.attachments && obj.content.attachments.length > 0) ? `<div class="attachments">
-${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" --data-src="[src]" --data-message="${obj.id}" --data-author="${obj.author.id}" alt="[name]">`))}
+${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" data-src="[src]" data-message="${obj.id}" data-author="${obj.author.id}" alt="[name]">`))}
 </div>` : '')}`;
             if (obj.content.text) setTimeout(() => {
                 messageElem.querySelector('.text-box').innerText = obj.content.text;

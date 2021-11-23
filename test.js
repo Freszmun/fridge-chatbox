@@ -38,3 +38,4 @@ function sendRes(text) {
     }, false);
 }
 
+sendRes('Hello!');
