@@ -1,8 +1,13 @@
 
+body {
+    max-height: 100vh;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
 app-chatbox {
-    --width: 360px;
-    --height: 600px;
-
+    --width: 100%;
+    --height: 100vh;
 }
 
 
@@ -14,6 +19,7 @@ app-chatbox {
     box-sizing: border-box;
     width: var(--width);
     height: var(--height);
+    max-height: var(--height);
     background-color: rgb(38, 38, 38);
 }
 

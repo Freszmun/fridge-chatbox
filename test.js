@@ -10,7 +10,7 @@ let messages = 0, chatHistory = [
 ];
 function showHistory() {
     for (let msg of chatHistory.reverse()) {
-        let now = new Date(new Date() + 12000 * messages),
+        let now = new Date(new Date().getTime() - 28000 * messages),
             time = (now.toLocaleDateString() + ' ' + now.toLocaleTimeString()).split(':');
         time.splice(2, 1);
         time = time.join(':');
