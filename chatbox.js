@@ -45,7 +45,7 @@
                 // add more button on message
                 moreActionsMessage: true,
                 // allow adding files
-                attachFiles: false,
+                attachFiles: true,
                 // filter files by type
                 attachFilesFilter: function (mimetype) {
                     // allow only images
@@ -231,6 +231,32 @@ ${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" data-src="[src]"
                     }
                 }
             });
+
+            this.addEventListener('dragover', function (ev) {
+                ev.preventDefault();
+            });
+            this.addEventListener('drop', ev => {
+                ev.preventDefault();
+                let attachmentsContainer = this.messageInputContainer.querySelector('.attachments-view');
+                if (!attachmentsContainer.files) attachmentsContainer.files = [];
+                    for (let dataTransfer of ev.dataTransfer.items) {
+                        let file = dataTransfer.getAsFile();
+                        if (this.config.methods.attachFilesFilter && this.config.methods.attachFilesFilter(file.type)) {
+                            file.arrayBuffer().then(data => {
+                                console.log(data)
+                                let base64 = new Buffer(data).toString('base64'),
+                                    img = document.createElement('IMG');
+                                    img.setAttribute('src', `data:${file.type};data, ${base64}`);
+                                    img.setAttribute('alt', file.name);
+                                    img.file = file;
+                                    attachmentsContainer.appendChild(img);
+                            });
+                            attachmentsContainer.files.push(file);
+                        }
+                    }
+
+            });
+
             setTimeout(this.initialize, null, this);
         }
     }
