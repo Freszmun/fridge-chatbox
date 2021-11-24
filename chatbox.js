@@ -242,15 +242,15 @@ ${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" data-src="[src]"
                     for (let dataTransfer of ev.dataTransfer.items) {
                         let file = dataTransfer.getAsFile();
                         if (this.config.methods.attachFilesFilter && this.config.methods.attachFilesFilter(file.type)) {
-                            file.arrayBuffer().then(data => {
-                                console.log(data)
-                                let base64 = new Buffer(data).toString('base64'),
-                                    img = document.createElement('IMG');
-                                    img.setAttribute('src', `data:${file.type};data, ${base64}`);
-                                    img.setAttribute('alt', file.name);
-                                    img.file = file;
-                                    attachmentsContainer.appendChild(img);
-                            });
+                            let img = document.createElement('IMG'),
+                                reader = new FileReader();
+                            img.setAttribute('alt', file.name);
+                            reader.onload = () => {
+                                img.src = reader.result;
+                            }
+                            reader.readAsDataURL(file);
+                            img.file = file;
+                            attachmentsContainer.appendChild(img);
                             attachmentsContainer.files.push(file);
                         }
                     }
