@@ -56,11 +56,14 @@
                 messages: {context: null, click: null},
                 attachments: {context: null, click: null},
                 avatar: {context: null, click: null},
-                onSend: null
+                onSend: null,
+                requestHistory: null
             }
         };
         messagesContainer;
         messageInputContainer;
+        requestingHistory = false;
+        lastScrollY = 0;
         initialize(_this) {
             _this.messagesContainer = document.createElement('div');
             _this.messageInputContainer = document.createElement('div');
@@ -75,22 +78,56 @@ ${icon('attachment')}` : '')}
 ${icon('send')}`;
                 _this.appendChild(_this.messageInputContainer);
             }
+            let noreqHistory = () => {
+                setTimeout(() => {
+                    _this.requestingHistory = false;
+                }, 200);
+            }
+            _this.messagesContainer.addEventListener('scroll', ev => {
+                if (_this.config.actions.requestHistory && !_this.requestingHistory && ev.target.scrollTop < 3 && _this.lastScrollY > ev.target.scrollTop) {
+                    _this.requestingHistory = true;
+                    if (_this.config.actions.requestHistory.then) {
+                        _this.config.actions.requestHistory(_this).then(() => {
+                            noreqHistory();
+                        }).catch(err => {
+                            noreqHistory();
+                            console.error(err);
+                        });
+                    } else {
+                        try {
+                            _this.config.actions.requestHistory(_this);
+                        } catch(err) {
+                            console.error(err);
+                        }
+                        noreqHistory();
+                    }
+                }
+                _this.lastScrollY = ev.target.scrollTop;
+            });
         }
         clearChatbox() {
             this.messagesContainer.innerHTML = '';
         }
         appendBefore(elem) {
             let firstMessage = this.messagesContainer.firstChild;
-            if (firstMessage) this.messagesContainer.insertBefore(elem, firstMessage);
-                else this.messagesContainer.appendChild(elem);
+            if (firstMessage) {
+                this.messagesContainer.insertBefore(elem, firstMessage);
+                if (firstMessage.getAttribute('data-message-author') === elem.getAttribute('data-message-author')) {
+                    let elems = [firstMessage.querySelector('img'), firstMessage.querySelector('.name')];
+                    if (elems[0]) firstMessage.removeChild(elems[0]);
+                    if (elems[1]) firstMessage.removeChild(elems[1]);
+                    firstMessage.classList.add('tab');
+                    elem.classList.add('tab-group');
+                }
+            } else this.messagesContainer.appendChild(elem);
         }
         append(elem) {
-            // TODO: add something like this for appendBefore
             let lastMessage = this.messagesContainer.lastChild;
             this.messagesContainer.appendChild(elem);
             if (lastMessage && lastMessage.getAttribute('data-message-author') === elem.getAttribute('data-message-author')) {
-                elem.removeChild(elem.querySelector('img'));
-                elem.removeChild(elem.querySelector('.name'));
+                let elems = [elem.querySelector('img'), elem.querySelector('.name')];
+                if (elems[0]) elem.removeChild(elems[0]);
+                if (elems[1]) elem.removeChild(elems[1]);
                 elem.classList.add('tab');
                 elem.previousElementSibling.classList.add('tab-group');
             }
@@ -151,7 +188,7 @@ ${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" data-src="[src]"
         }
 
         sendAction(elem) {
-            let text = elem.innerText.replaceAll(RegExp(/\<br\>/gm), '\n');
+            let text = elem.innerText;
             if (!text || text === '') return;
             if (this.config.actions.onSend) this.config.actions.onSend(text);
             elem.innerHTML = '';
