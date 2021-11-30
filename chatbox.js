@@ -160,11 +160,11 @@ ${icon('send')}`;
             messageElem.setAttribute('data-message-author', obj.author.id);
             messageElem.innerHTML = `
 ${(this.config.showTime ? `<span class="time">${obj.time}</span>` : '')}
-${(this.config.showAvatars ? `<img src="${obj.author.avatar}" alt="${obj.author.name}">` : '')}
+${(this.config.showAvatars ? `<img class="avatar" src="${obj.author.avatar}" alt="${obj.author.name}">` : '')}
 ${(this.config.showNames ? `<span class="name">${obj.author.name}</span>` : '')}
 ${(obj.content.text ? `<div class="text-box"></div>` : '')}
 ${((obj.content.attachments && obj.content.attachments.length > 0) ? `<div class="attachments">
-${(iterateTemplate(obj.content.attachments, `<img src="[thumb]" data-src="[src]" data-message="${obj.id}" data-author="${obj.author.id}" alt="[name]">`))}
+${(iterateTemplate(obj.content.attachments, `<img class="attachment" src="[thumb]" data-src="[src]" data-message="${obj.id}" data-author="${obj.author.id}" alt="[name]">`))}
 </div>` : '')}`;
             if (obj.content.text) setTimeout(() => {
                 messageElem.querySelector('.text-box').innerText = obj.content.text;

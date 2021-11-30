@@ -77,11 +77,16 @@ app-chatbox .messages-container .message.tab .text-box {
 
 app-chatbox .messages-container .message .name {
     float: left;
+    width: calc(100% - 26px);
+    padding-left: 5px;
+    font-size: .9em;
+    color: rgb(157, 157, 157);
+}
+
+app-chatbox .messages-container .message.show-avatars .name {
     width: calc(100% - 80px);
     text-align: left;
     padding-left: 12px;
-    font-size: .9em;
-    color: rgb(157, 157, 157);
 }
 
 app-chatbox .messages-container .message .time {
@@ -103,7 +108,7 @@ app-chatbox .messages-container .message .text-box {
     max-width: 80%;
     box-sizing: border-box;
     padding: 4px;
-    margin: 2px 0 5px 10px;
+    margin: 2px 0 5px 5px;
     float: left;
     text-align: left;
     font-size: 1.2em;
@@ -112,11 +117,16 @@ app-chatbox .messages-container .message .text-box {
     word-break: break-all;
 }
 
-app-chatbox .messages-container .message.tab .text-box {
+app-chatbox .messages-container .message.show-avatars .text-box {
+    margin: 2px 0 5px 10px;
+}
+
+app-chatbox .messages-container .message.show-avatars.tab .text-box {
     margin: 2px 0 0 54px;
 }
 
-app-chatbox .messages-container .message img {
+
+app-chatbox .messages-container .message .avatar {
     float: left;
     width: 44px;
     height: 44px;
@@ -128,18 +138,28 @@ app-chatbox .messages-container .message img {
 app-chatbox .messages-container .message.right .name {
     text-align: right;
     padding-left: unset;
-    padding-right: 12px;
+    padding-right: 5px;
     float: right;
 }
-
+app-chatbox .messages-container .message.show-avatars.right .name {
+    padding-right: 12px;
+}
 
 app-chatbox .messages-container .message.right .text-box {
     border-radius: 5px 1px 5px 5px;
-    margin: 2px 10px 5px 0;
+    margin: 2px 5px 5px 0;
     float: right;
 }
 
+app-chatbox .messages-container .message.show-avatars.right .text-box {
+    margin: 2px 10px 5px 0;
+}
+
 app-chatbox .messages-container .message.right.tab .text-box {
+    margin: 2px 5px 0 0;
+}
+
+app-chatbox .messages-container .message.show-avatars.right.tab .text-box {
     margin: 2px 54px 0 0;
 }
 

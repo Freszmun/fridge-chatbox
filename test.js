@@ -1,4 +1,5 @@
 const chatbox = document.querySelector('app-chatbox');
+chatbox.config.showAvatars = false;
 chatbox.config.actions.requestHistory = function(chatboxElem) {
     console.log('Requested chat history');
 }
